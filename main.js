@@ -18,7 +18,34 @@ function animateRiver(layer, speed = 100, dashArray = '10, 10') {
     return { interval, dashArray };
 }
 
-// Загрузка GeoJSON с реками
+// Загрузка GeoJSON с реками (Data_Rivers.geojson)
+fetch('Data_Rivers.geojson')
+    .then(response => response.json())
+    .then(data => {
+        // Стиль для рек
+        const riverStyle = {
+            color: '#1E90FF', // Цвет рек (DodgerBlue)
+            weight: 2,        // Толщина линии
+            opacity: 0.8,     // Прозрачность
+            fillOpacity: 0.1  // Прозрачность заливки (если есть)
+        };
+
+        // Отображение рек на карте
+        L.geoJSON(data, {
+            style: riverStyle,
+            onEachFeature: (feature, layer) => {
+                // Добавляем всплывающее окно с информацией о реке
+                if (feature.properties && feature.properties.name) {
+                    layer.bindPopup(`<b>${feature.properties.name}</b>`);
+                }
+            }
+        }).addTo(map);
+    })
+    .catch(error => {
+        console.error('Ошибка загрузки Data_Rivers.geojson:', error);
+    });
+
+// Загрузка GeoJSON с рыбами (Data_Fish_JSON.json)
 fetch('Data_Fish_JSON.json')
     .then(response => response.json())
     .then(data => {
@@ -82,4 +109,7 @@ fetch('Data_Fish_JSON.json')
         map.on('unload', () => {
             riverAnimations.forEach(anim => clearInterval(anim.interval));
         });
+    })
+    .catch(error => {
+        console.error('Ошибка загрузки Data_Fish_JSON.json:', error);
     });
