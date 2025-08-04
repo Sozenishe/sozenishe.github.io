@@ -8,53 +8,120 @@ function animateRiver(layer, speed = 100, dashArray = '10, 10') {
     return { interval, dashArray };
   }
   
-  // 2. Инициализация карты
-  const map = L.map('map').setView([56.0, 159.0], 6);
+// 2. Инициализация карты
+const map = L.map('map').setView([56.0, 159.0], 6);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap'
-  }).addTo(map);
+}).addTo(map);
   
-
   
   // 3. Загрузка данных
   Promise.all([
     fetch('Data_Rivers.geojson').then(res => res.json()),
     fetch('Data_Fish.json').then(res => res.json())
   ])
-  .then(([riversGeoData, fishData]) => {
-    const fishByRiver = fishData.reduce((acc, item) => {
-      if (!acc[item.name]) acc[item.name] = [];
-      acc[item.name].push({ name: item.fish, description: item.description });
-      return acc;
-    }, {});
-  
-    const riverStyle = {
-      color: '#1E90FF',
-      weight: 2,
-      opacity: 0.8
-    };
-  
-    L.geoJSON(riversGeoData, {
-      style: riverStyle,
-      onEachFeature: (feature, layer) => {
-        const riverName = feature.properties.name;
-        const fishes = fishByRiver[riverName] || [];
-  
-        layer.bindTooltip(riverName, { 
-          permanent: false, 
-          className: 'river-tooltip' 
-        });
-  
-        layer.bindPopup(`
-          <b>${riverName}</b>
-          <ul class="fish-list">
-            ${fishes.map(fish => `
-              <li class="fish-item">
-                <strong>${fish.name}</strong>: ${fish.description}
-              </li>
-            `).join('')}
-          </ul>
-        `);
+.then(([riversGeoData, fishData]) => {
+    // Загружаем данные о нерке
+    fetch('Data_Nerka.json')
+      .then(res => res.json())
+      .then(nerkaData => {
+        const fishByRiver = fishData.reduce((acc, item) => {
+          if (!acc[item.name]) acc[item.name] = [];
+          acc[item.name].push({ name: item.fish, description: item.description });
+          return acc;
+        }, {});
+
+        const riverStyle = {
+          color: '#1E90FF',
+          weight: 2,
+          opacity: 0.8
+        };
+
+        // Функция для создания HTML попапа с деталями о нерке
+        function createNerkaPopup(nerkaData) {
+          const data = nerkaData.nerka;
+          return `
+            <div class="fish-details">
+              <button class="back-button">← Назад к списку</button>
+              <h3>Нерка (${data.systematic.species})</h3>
+              
+              <section>
+                <h4>Систематика</h4>
+                <p><strong>Класс:</strong> ${data.systematic.class}</p>
+                <p><strong>Отряд:</strong> ${data.systematic.order}</p>
+                <p><strong>Семейство:</strong> ${data.systematic.family}</p>
+              </section>
+              
+              <section>
+                <h4>Распространение</h4>
+                <p>${data.distribution}</p>
+              </section>
+              
+              <section>
+                <h4>Размер</h4>
+                <p>${data.size}</p>
+              </section>
+              
+              <section>
+                <h4>Цикл жизни</h4>
+                <div class="life-cycle">
+                  <p><strong>Нерест:</strong> ${data.life_cycle.spawning.period}</p>
+                  <p><strong>Вылупление:</strong> ${data.life_cycle.spawning.hatching}</p>
+                  <p><strong>Морской нагул:</strong> ${data.life_cycle.marine_feeding.duration}</p>
+                  <!-- Добавьте другие этапы по аналогии -->
+                </div>
+              </section>
+            </div>
+          `;
+        }
+
+        L.geoJSON(riversGeoData, {
+          style: riverStyle,
+          onEachFeature: (feature, layer) => {
+            const riverName = feature.properties.name;
+            const fishes = fishByRiver[riverName] || [];
+
+            layer.bindTooltip(riverName, { 
+              permanent: false, 
+              className: 'river-tooltip' 
+            });
+
+            layer.bindPopup(`
+              <b>${riverName}</b>
+              <ul class="fish-list">
+                ${fishes.map(fish => `
+                  <li class="fish-item" data-fish="${fish.name}">
+                    <strong>${fish.name}</strong>
+                    <div class="fish-short-desc">${fish.description}</div>
+                  </li>
+                `).join('')}
+              </ul>
+            `);
+
+            // Обработчик открытия попапа
+            layer.on('popupopen', function() {
+              const currentPopup = layer.getPopup();
+              const riverName = feature.properties.name;
+              
+              document.querySelectorAll('.fish-item').forEach(item => {
+                item.addEventListener('click', () => {
+                  if (item.dataset.fish === 'Нерка') {
+                    const nerkaPopup = L.popup()
+                      .setLatLng(currentPopup.getLatLng())
+                      .setContent(createNerkaPopup(nerkaData, riverName, fishes))
+                      .openOn(map);
+                    
+                    // Обработчик кнопки назад
+                    nerkaPopup._container.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('back-button')) {
+                      nerkaPopup.remove();
+                      currentPopup.setLatLng(nerkaPopup.getLatLng()).openOn(map);
+                    }
+                    });
+                  }
+                });
+              });
+            });
         
         // Анимация только для "Озёрная"
         if (riverName === "Озёрная") {
@@ -77,74 +144,9 @@ function animateRiver(layer, speed = 100, dashArray = '10, 10') {
       }
     }).addTo(map);
   })
-  .catch(error => console.error('Ошибка:', error));
-// Загрузка GeoJSON с рыбами (Data_Fish_JSON.json) //пока что не нужно
-// fetch('Data_Fish_JSON.json')
-//     .then(response => response.json())
-//     .then(data => {
-//         const riverAnimations = [];
-        
-//         L.geoJSON(data, {
-//             style: { 
-//                 color: 'blue', 
-//                 weight: 3,
-//                 dashArray: '10, 10',
-//                 dashOffset: '0',
-//                 opacity: 0.8
-//             },
-//             onEachFeature: (feature, layer) => {
-//                 layer.bindPopup(`
-//                     <b>${feature.properties.river_name}</b><br>
-//                     Рыбы: ${feature.properties.species}
-//                 `);
-                
-//                 // Анимация для реки (только для реки Озерная)
-//                 if (feature.properties.river_name === "Река Озёрная") {
-//                     const animation = animateRiver(layer);
-//                     riverAnimations.push({
-//                         layer,
-//                         interval: animation.interval,
-//                         originalStyle: {
-//                             dashArray: animation.dashArray,
-//                             speed: 100
-//                         }
-//                     });
+  
+      .catch(error => console.error('Ошибка загрузки данных о нерке:', error));
+  })
 
-//                     // Анимация при наведении
-//                     layer.on('mouseover', () => {
-//                         layer.setStyle({
-//                             weight: 5,
-//                             opacity: 1,
-//                             dashArray: '5, 5' // Более частый пунктир
-//                         });
-                        
-//                         // Ускоряем анимацию
-//                         clearInterval(animation.interval);
-//                         animation.interval = animateRiver(layer, 50, '5, 5').interval;
-//                     });
-
-//                     layer.on('mouseout', () => {
-//                         layer.setStyle({
-//                             weight: 3,
-//                             opacity: 0.8,
-//                             dashArray: '10, 10' // Возвращаем исходный пунктир
-//                         });
-                        
-//                         // Возвращаем обычную скорость
-//                         clearInterval(animation.interval);
-//                         animation.interval = animateRiver(layer, 100, '10, 10').interval;
-//                     });
-//                 }
-//             }
-//         }).addTo(map);
-        
-//         // Очистка интервалов при уничтожении карты
-//         map.on('unload', () => {
-//             riverAnimations.forEach(anim => clearInterval(anim.interval));
-//         });
-//     })
-//     .catch(error => {
-//         console.error('Ошибка загрузки Data_Fish_JSON.json:', error);
-//     });
-
+.catch(error => console.error('Ошибка:', error));
 
