@@ -1,4 +1,4 @@
-// 1. Функция для анимации (ДОБАВЬТЕ ЭТО В НАЧАЛО)
+// Функция для анимации
 function animateRiver(layer, speed = 100, dashArray = '10, 10') {
     let offset = 0;
     const interval = setInterval(() => {
@@ -8,14 +8,14 @@ function animateRiver(layer, speed = 100, dashArray = '10, 10') {
     return { interval, dashArray };
   }
   
-// 2. Инициализация карты
+// Инициализация карты
 const map = L.map('map').setView([56.0, 159.0], 6);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap'
 }).addTo(map);
   
   
-  // 3. Загрузка данных
+  // Загрузка данных
   Promise.all([
     fetch('Data_Rivers.geojson').then(res => res.json()),
     fetch('Data_Fish.json').then(res => res.json())
@@ -42,35 +42,47 @@ const map = L.map('map').setView([56.0, 159.0], 6);
           const data = nerkaData.nerka;
           return `
             <div class="fish-details">
-              <button class="back-button">← Назад к списку</button>
               <h3>Нерка (${data.systematic.species})</h3>
               
               <section>
                 <h4>Систематика</h4>
-                <p><strong>Класс:</strong> ${data.systematic.class}</p>
-                <p><strong>Отряд:</strong> ${data.systematic.order}</p>
-                <p><strong>Семейство:</strong> ${data.systematic.family}</p>
+                <div class="life-cycle">
+                  <p><strong>Класс:</strong> ${data.systematic.class}</p>
+                  <p><strong>Отряд:</strong> ${data.systematic.order}</p>
+                  <p><strong>Семейство:</strong> ${data.systematic.family}</p>
+                </div>
               </section>
               
               <section>
                 <h4>Распространение</h4>
-                <p>${data.distribution}</p>
+                <div class="life-cycle">
+                  <p>${data.distribution}</p>
+                </div>
               </section>
               
               <section>
                 <h4>Размер</h4>
-                <p>${data.size}</p>
+                <div class="life-cycle">
+                  <p>${data.size}</p>
+                </div>
               </section>
               
               <section>
-                <h4>Цикл жизни</h4>
+                <h4>Цикл развития</h4>
                 <div class="life-cycle">
                   <p><strong>Нерест:</strong> ${data.life_cycle.spawning.period}</p>
                   <p><strong>Вылупление:</strong> ${data.life_cycle.spawning.hatching}</p>
+                  <p><strong>Миграция:</strong> ${data.life_cycle.first_migration.description}</p>
+                  <p><strong>Первая зимовка:</strong> ${data.life_cycle.first_wintering.description}</p>
+                  <p><strong>Вторая зимовка:</strong> ${data.life_cycle.second_wintering.description}</p>
                   <p><strong>Морской нагул:</strong> ${data.life_cycle.marine_feeding.duration}</p>
-                  <!-- Добавьте другие этапы по аналогии -->
+                  <p><strong>Пресноводный нагул:</strong> ${data.life_cycle.freshwater_feeding.duration}</p>
+                  <p><strong>Обратная миграция в озеро:</strong> ${data.life_cycle.return_migration.description}</p>
                 </div>
               </section>
+              <div class="popup-footer">
+                <button class="back-button">← Назад к списку</button>
+              </div>
             </div>
           `;
         }
