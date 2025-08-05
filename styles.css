@@ -79,7 +79,6 @@
   transform: translateX(3px) scale(0.98);
 }
 
-  /* Добавьте в конец файла */
 
 .fish-link {
   color: #1E90FF;
@@ -210,3 +209,4 @@
   transform: scale(0.99);
   transition: transform 0.1s cubic-bezier(0.5, 2, 0.5, 1);
 }
+
