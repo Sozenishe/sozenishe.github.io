@@ -64,7 +64,7 @@
 
 /* Добавляем индикатор кликабельности */
 .fish-item::after {
-  content: "→";
+  content: " ";
   float: right;
   color: #1E90FF;
   opacity: 0;
@@ -187,3 +187,4 @@
 .back-button:hover {
   background: #0d6efd;
 }
+
