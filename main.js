@@ -1,4 +1,4 @@
-// Функция для анимации
+// 1. Функция для анимации
 function animateRiver(layer, speed = 100, dashArray = '10, 10') {
     let offset = 0;
     const interval = setInterval(() => {
@@ -6,16 +6,85 @@ function animateRiver(layer, speed = 100, dashArray = '10, 10') {
       layer.setStyle({ dashOffset: offset });
     }, speed);
     return { interval, dashArray };
-  }
-  
-// Инициализация карты
+}
+
+// 2. Инициализация карты
 const map = L.map('map').setView([56.0, 159.0], 6);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap'
+
+// 3. Слои (основные и оверлеи)
+const baseLayers = {
+    "OSM Стандарт": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }),
+    "Рельеф (OpenTopoMap)": L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenTopoMap',
+        maxZoom: 17  // OpenTopoMap имеет ограничение по зуму
+    })
+};
+
+const reliefOverlay = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}', {
+    opacity: 0.4,
+    attribution: 'Esri World Shaded Relief'
+});
+
+// 4. Добавляем стандартный слой и контролы
+baseLayers["OSM Стандарт"].addTo(map);
+const layerControl = L.control.layers(baseLayers, {
+    "Рельеф (полупрозрачный)": reliefOverlay
 }).addTo(map);
+
+layerControl.addTo(map);
+
+// Обновляем иконки после отрисовки контрола
+map.on('layeradd layerremove', function() {
+    updateLayerIcons();
+});
+
+function updateLayerIcons() {
+    const container = layerControl.getContainer();
+    if (!container) return;
+    
+    container.querySelectorAll('label').forEach(label => {
+        if (label.textContent.includes('OpenTopoMap') && !label.querySelector('.icon-mountain')) {
+            const icon = document.createElement('span');
+            icon.className = 'icon-mountain';
+            icon.innerHTML = '🗻';
+            icon.style.marginRight = '8px';
+            label.prepend(icon);
+        }
+        if (label.textContent.includes('полупрозрачный') && !label.querySelector('.icon-magnifier')) {
+            const icon = document.createElement('span');
+            icon.className = 'icon-magnifier';
+            icon.innerHTML = '🔍';
+            icon.style.marginRight = '8px';
+            label.prepend(icon);
+            
+            // Добавляем слайдер только если его нет
+            if (!label.querySelector('.opacity-slider')) {
+                const slider = document.createElement('input');
+                slider.type = 'range';
+                slider.className = 'opacity-slider';
+                slider.min = '0.1';
+                slider.max = '0.8';
+                slider.step = '0.1';
+                slider.value = '0.4';
+                slider.style.width = '100%';
+                slider.style.marginTop = '8px';
+                
+                slider.addEventListener('input', (e) => {
+                    reliefOverlay.setOpacity(e.target.value);
+                });
+                
+                label.appendChild(slider);
+            }
+        }
+    });
+}
+
+// Первоначальное обновление
+updateLayerIcons();
   
-  
-  // Загрузка данных
+  // 3. Загрузка данных
   Promise.all([
     fetch('Data_Rivers.geojson').then(res => res.json()),
     fetch('Data_Fish.json').then(res => res.json())
