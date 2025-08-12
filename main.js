@@ -32,64 +32,14 @@ baseLayers["OSM Стандарт"].addTo(map);
 const layerControl = L.control.layers(baseLayers, {
     "Рельеф (полупрозрачный)": reliefOverlay
 }).addTo(map);
-
-layerControl.addTo(map);
-
-// Обновляем иконки после отрисовки контрола
-map.on('layeradd layerremove', function() {
-    updateLayerIcons();
-});
-
-function updateLayerIcons() {
-    const container = layerControl.getContainer();
-    if (!container) return;
-    
-    container.querySelectorAll('label').forEach(label => {
-        if (label.textContent.includes('OpenTopoMap') && !label.querySelector('.icon-mountain')) {
-            const icon = document.createElement('span');
-            icon.className = 'icon-mountain';
-            icon.innerHTML = '🗻';
-            icon.style.marginRight = '8px';
-            label.prepend(icon);
-        }
-        if (label.textContent.includes('полупрозрачный') && !label.querySelector('.icon-magnifier')) {
-            const icon = document.createElement('span');
-            icon.className = 'icon-magnifier';
-            icon.innerHTML = '🔍';
-            icon.style.marginRight = '8px';
-            label.prepend(icon);
-            
-            // Добавляем слайдер только если его нет
-            if (!label.querySelector('.opacity-slider')) {
-                const slider = document.createElement('input');
-                slider.type = 'range';
-                slider.className = 'opacity-slider';
-                slider.min = '0.1';
-                slider.max = '0.8';
-                slider.step = '0.1';
-                slider.value = '0.4';
-                slider.style.width = '100%';
-                slider.style.marginTop = '8px';
-                
-                slider.addEventListener('input', (e) => {
-                    reliefOverlay.setOpacity(e.target.value);
-                });
-                
-                label.appendChild(slider);
-            }
-        }
-    });
-}
-
-// Первоначальное обновление
-updateLayerIcons();
   
   // 3. Загрузка данных
   Promise.all([
     fetch('Data_Rivers.geojson').then(res => res.json()),
-    fetch('Data_Fish.json').then(res => res.json())
+    fetch('Data_Fish.json').then(res => res.json()),
+    fetch('Kurilskoye_Lake.geojson').then(res => res.json())
   ])
-.then(([riversGeoData, fishData]) => {
+.then(([riversGeoData, fishData, lakeData]) => {
     // Загружаем данные о нерке
     fetch('Data_Nerka.json')
       .then(res => res.json())
@@ -100,11 +50,36 @@ updateLayerIcons();
           return acc;
         }, {});
 
+        // Стиль для рек
         const riverStyle = {
           color: '#1E90FF',
-          weight: 2,
+          weight: 3,
           opacity: 0.8
         };
+
+        // Стиль для озера Курильское
+        const lakeStyle = {
+          fillColor: '#1E90FF',
+          weight: 2,
+          opacity: 1,
+          color: '#0d6efd',
+          fillOpacity: 0.3
+        };
+
+        // Функция для создания попапа с рыбами (общая для рек и озера)
+        function createFishPopup(name, fishes) {
+          return `
+            <b>${name}</b>
+            <ul class="fish-list">
+              ${fishes.map(fish => `
+                <li class="fish-item" data-fish="${fish.name}">
+                  <strong>${fish.name}</strong>
+                  <div class="fish-short-desc">${fish.description}</div>
+                </li>
+              `).join('')}
+            </ul>
+          `;
+        }
 
         // Функция для создания HTML попапа с деталями о нерке
         function createNerkaPopup(nerkaData) {
@@ -155,6 +130,43 @@ updateLayerIcons();
             </div>
           `;
         }
+
+        // Добавляем озеро Курильское
+        L.geoJSON(lakeData, {
+          style: lakeStyle,
+          onEachFeature: (feature, layer) => {
+            const lakeName = "Курильское озеро";
+            const fishes = fishByRiver["Курильское"] || []; // Предполагаем, что в Data_Fish.json есть запись для "Курильское"
+            
+            layer.bindTooltip(lakeName, {
+              permanent: false,
+              className: 'lake-tooltip'
+            });
+
+            layer.bindPopup(createFishPopup(lakeName, fishes));
+            
+            // Обработчик для попапа нерки (аналогично рекам)
+            layer.on('popupopen', function() {
+              document.querySelectorAll('.fish-item').forEach(item => {
+                item.addEventListener('click', () => {
+                  if (item.dataset.fish === 'Нерка') {
+                    const nerkaPopup = L.popup()
+                      .setLatLng(layer.getPopup().getLatLng())
+                      .setContent(createNerkaPopup(nerkaData))
+                      .openOn(map);
+                      
+                    nerkaPopup._container.addEventListener('click', (e) => {
+                      if (e.target.classList.contains('back-button')) {
+                        nerkaPopup.remove();
+                        layer.openPopup();
+                      }
+                    });
+                  }
+                });
+              });
+            });
+          }
+        }).addTo(map);
 
         L.geoJSON(riversGeoData, {
           style: riverStyle,
