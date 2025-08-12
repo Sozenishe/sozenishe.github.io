@@ -172,15 +172,15 @@
   margin-left: 10px;
 }
 
-/* КНОПКА ВОЗВРАТА В МЕНЮ*/
+/* КНОПКА ВОЗВРАТА В МЕНЮ */
 .fish-details {
   display: flex;
   flex-direction: column;
-  min-height: 100%; /* Занимаем всю высоту попапа */
+  min-height: 100%;
 }
 
 .popup-footer {
-  margin-top: auto; /* Прижимаем к низу */
+  margin-top: auto;
   padding-top: 15px;
   border-top: 1px solid #eee;
   text-align: center;
@@ -194,11 +194,9 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
   width: 100%;
   max-width: 200px;
-  transform: translateY(0);
-  transition: transform 0.2s;
 }
 
 .back-button:hover {
@@ -207,133 +205,76 @@
 }
 
 .back-button:active {
-  transform: scale(0.99);
-  transition: transform 0.1s cubic-bezier(0.5, 2, 0.5, 1);
+  transform: scale(0.98);
 }
 
-
-/* Стили для контроллера слоёв */
+/* УЛУЧШЕННЫЙ КОНТРОЛЛЕР СЛОЕВ С АНИМАЦИЕЙ */
 .leaflet-control-layers {
-    background: rgba(255, 255, 255, 0.95) !important;
-    border-radius: 12px !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
-    border: none !important;
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid #1E90FF !important;
+    border-radius: 15px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
-    transition: all 0.3s ease;
+    max-height: 40px; /* Начальное состояние */
 }
 
-.leaflet-control-layers:hover {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2) !important;
+/* Состояние при раскрытии */
+.leaflet-control-layers-expanded {
+    max-height: 300px; /* Достаточно для содержимого */
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 8px !important;
 }
 
 .leaflet-control-layers-toggle {
-    width: 40px !important;
-    height: 40px !important;
-    background: #1E90FF url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 4.5C7 4.5 2.7 7.6 1 12c1.7 4.4 6 7.5 11 7.5s9.3-3.1 11-7.5c-1.7-4.4-6-7.5-11-7.5zm0 12.5c-2.8 0-5-2.2-5-5s2.2-5 5-5 5 2.2 5 5-2.2 5-5 5z"/></svg>') no-repeat center !important;
-    background-size: 60% !important;
-    border-radius: 50% !important;
-    transition: transform 0.2s, background-color 0.3s;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%231E90FF"><path d="M12 4.5C7 4.5 2.7 7.6 1 12c1.7 4.4 6 7.5 11 7.5s9.3-3.1 11-7.5c-1.7-4.4-6-7.5-11-7.5zm0 12.5c-2.8 0-5-2.2-5-5s2.2-5 5-5 5 2.2 5 5-2.2 5-5 5z"/></svg>') !important;
+    transition: transform 0.3s ease;
 }
 
 .leaflet-control-layers-toggle:hover {
-    transform: scale(1.1);
-    background-color: #0d6efd !important;
+    transform: rotate(90deg);
 }
 
-/* Стили для раскрытого меню */
-.leaflet-control-layers-expanded {
-    padding: 12px !important;
-    width: 220px !important;
-}
-
+/* Плавное появление элементов */
 .leaflet-control-layers-list {
-    margin-top: 8px;
-}
-
-.leaflet-control-layers-label {
-    display: flex !important;
-    align-items: center;
-    padding: 8px 0 !important;
-    margin: 0 !important;
-    position: relative;
-    cursor: pointer;
-}
-
-/* Кастомные чекбоксы */
-.leaflet-control-layers-label:before {
-    content: '';
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    margin-right: 10px;
-    border: 2px solid #1E90FF;
-    border-radius: 4px;
-    background: white;
-    transition: all 0.2s;
-}
-
-.leaflet-control-layers-selector:checked + .leaflet-control-layers-label:before {
-    background: #1E90FF url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>') no-repeat center;
-    background-size: 12px;
-}
-
-.leaflet-control-layers-label:hover:before {
-    border-color: #0d6efd;
-}
-
-/* Разделитель */
-.leaflet-control-layers-separator {
-    margin: 10px 0 !important;
-    border-bottom: 1px dashed #e0e0e0;
-}
-
-/* Анимация переключения */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-5px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.leaflet-control-layers-expanded {
-    animation: fadeIn 0.3s ease-out;
-}
-
-/* Фикс для кликабельной области */
-.leaflet-control-layers-selector {
-    position: absolute;
     opacity: 0;
-    z-index: 1;
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
+    transition: opacity 0.3s ease 0.1s; /* Задержка для красоты */
 }
 
-/* Иконки слоёв */
-.icon-mountain, .icon-magnifier {
-    display: inline-block;
-    width: 20px;
-    text-align: center;
+.leaflet-control-layers-expanded .leaflet-control-layers-list {
+    opacity: 1;
 }
 
-/* Слайдер прозрачности */
-.opacity-slider {
-    -webkit-appearance: none;
-    height: 4px;
-    background: #ddd;
-    border-radius: 2px;
-    margin: 10px 0 5px 0;
+/* Кнопка переключения рельефа */
+.relief-toggle {
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    z-index: 1000;
+    background: white;
+    padding: 5px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
 }
 
-.opacity-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
-    background: #1E90FF;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.2s;
+.relief-toggle:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    transform: translateY(-1px);
 }
 
-.opacity-slider::-webkit-slider-thumb:hover {
-    background: #0d6efd;
-    transform: scale(1.1);
+/* Стиль для подсказки озера */
+.lake-tooltip {
+    background: rgba(255, 255, 255, 0.9);
+    border: 5px solid #0d6efd;
+    border-radius: 6px;
+    padding: 2px 6px;
+    font-size: 12px;
+    color: #333;
+    white-space: nowrap;
+}
+
+/* Стиль для полигона озера при наведении */
+.leaflet-interactive.lake-highlight:hover {
+    fill-opacity: 0.5;
+    weight: 3;
 }
