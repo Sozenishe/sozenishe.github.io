@@ -1,11 +1,62 @@
-// 1. Функция для анимации
-function animateRiver(layer, speed = 100, dashArray = '10, 10') {
+// // 1. Функция для анимации
+// function animateRiver(layer, speed = 100, dashArray = '10, 10') {
+//     let offset = 0;
+//     const interval = setInterval(() => {
+//       offset = (offset + 1) % 20;
+//       layer.setStyle({ dashOffset: offset });
+//     }, speed);
+//     return { interval, dashArray };
+// }
+
+function animateWaterBody(layer, options = {}) {
+    const {
+        speed = 150,  // Базовая скорость (можно регулировать)
+        baseDashArray = '15, 10',
+        hoverDashArray = '10, 5',
+        baseWeight = 2,
+        hoverWeight = 4,
+        baseOpacity = 0.8,
+        hoverOpacity = 1
+    } = options;
+
     let offset = 0;
-    const interval = setInterval(() => {
-      offset = (offset + 1) % 20;
-      layer.setStyle({ dashOffset: offset });
-    }, speed);
-    return { interval, dashArray };
+    let interval = null;
+
+    // Функция обновления анимации
+    const updateAnimation = () => {
+        offset = (offset - 1) % 20;
+        layer.setStyle({ dashOffset: -offset });
+    };
+
+    // Запуск анимации
+    const startAnimation = (currentSpeed) => {
+        if (interval) clearInterval(interval);  // Очищаем предыдущий интервал
+        interval = setInterval(updateAnimation, currentSpeed);
+    };
+
+    // Старт базовой анимации
+    startAnimation(speed);
+
+    // Обработчики событий (без рекурсии)
+    layer.on('mouseover', () => {
+        layer.setStyle({
+            weight: hoverWeight,
+            dashArray: hoverDashArray,
+            opacity: hoverOpacity
+        });
+        startAnimation(speed);  // Можно оставить speed или сделать speed * 1.5 для замедления
+    });
+
+    layer.on('mouseout', () => {
+        layer.setStyle({
+            weight: baseWeight,
+            dashArray: baseDashArray,
+            opacity: baseOpacity
+        });
+        startAnimation(speed);  // Возвращаем базовую скорость
+    });
+
+    return { interval, options };
 }
 
 // 2. Инициализация карты
@@ -168,16 +219,27 @@ const layerControl = L.control.layers(baseLayers, {
           }
         }).addTo(map);
 
-        L.geoJSON(riversGeoData, {
-          style: riverStyle,
-          onEachFeature: (feature, layer) => {
-            const riverName = feature.properties.name;
-            const fishes = fishByRiver[riverName] || [];
+L.geoJSON(riversGeoData, {
+    style: riverStyle,
+    onEachFeature: (feature, layer) => {
+        const riverName = feature.properties.name;
+        const fishes = fishByRiver[riverName] || [];
 
-            layer.bindTooltip(riverName, { 
-              permanent: false, 
-              className: 'river-tooltip' 
-            });
+        // Анимация для всех рек
+        layer.setStyle({ dashArray: '15, 10' });
+        const animation = animateWaterBody(layer, {
+            baseWeight: 2,
+            hoverWeight: 4,
+            baseDashArray: '15, 10',
+            hoverDashArray: '10, 5'
+        });
+
+
+        // Подсказка
+        layer.bindTooltip(riverName, {
+            permanent: false,
+            className: 'river-tooltip'
+        });
 
             layer.bindPopup(`
               <b>${riverName}</b>
@@ -215,25 +277,7 @@ const layerControl = L.control.layers(baseLayers, {
                 });
               });
             });
-        
-        // Анимация только для "Озёрная"
-        if (riverName === "Озёрная") {
-            
-          layer.setStyle({ dashArray: '10, 10' }); // Добавляем пунктир
-          const animation = animateRiver(layer);
-          
-          layer.on('mouseover', () => {
-            layer.setStyle({ weight: 5, opacity: 1, dashArray: '5, 5' });
-            clearInterval(animation.interval);
-            animation.interval = animateRiver(layer, 50, '5, 5').interval;
-          });
-  
-          layer.on('mouseout', () => {
-            layer.setStyle({ weight: 2, opacity: 0.8, dashArray: '10, 10' });
-            clearInterval(animation.interval);
-            animation.interval = animateRiver(layer, 100, '10, 10').interval;
-          });
-        }
+
       }
     }).addTo(map);
   })
