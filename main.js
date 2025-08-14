@@ -1,4 +1,4 @@
-// // 1. Функция для анимации
+// // 1. Функция для анимации рек
 // function animateRiver(layer, speed = 100, dashArray = '10, 10') {
 //     let offset = 0;
 //     const interval = setInterval(() => {
@@ -7,7 +7,7 @@
 //     }, speed);
 //     return { interval, dashArray };
 // }
-
+// // 1. Функция для анимации рек
 function animateWaterBody(layer, options = {}) {
     const {
         speed = 150,  // Базовая скорость (можно регулировать)
@@ -286,4 +286,5 @@ L.geoJSON(riversGeoData, {
   })
 
 .catch(error => console.error('Ошибка:', error));
+
 
