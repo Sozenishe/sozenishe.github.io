@@ -1,6 +1,10 @@
+/* ======================
+   БАЗОВЫЕ СТИЛИ 
+   ====================== */
 * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 #map {
@@ -8,14 +12,31 @@
     width: 100vw;
 }
 
+/* Скрытие атрибуции Leaflet */
 .leaflet-control-attribution {
     display: none !important;
 }
 
-/* Стиль для подсказок рек */
-.river-tooltip {
+/* ======================
+   СТИЛИ ДЛЯ КАРТЫ И ОБЪЕКТОВ
+   ====================== */
+/* Общие стили для интерактивных элементов */
+.leaflet-interactive {
+    transition: all 0.2s ease;
+}
+
+.leaflet-interactive:hover {
+    stroke-width: 4px !important;
+}
+
+.leaflet-interactive:focus {
+    outline: none !important;
+}
+
+/* Стили для подсказок */
+.river-tooltip,
+.lake-tooltip {
     background: rgba(255, 255, 255, 0.9);
-    border: 5px solid #1E90FF;
     border-radius: 6px;
     padding: 2px 6px;
     font-size: 12px;
@@ -23,204 +44,139 @@
     white-space: nowrap;
 }
 
-/* Улучшение видимости при наведении */
-.leaflet-interactive:hover {
-    stroke-width: 4px !important; /* Утолщаем линию реки */
+.river-tooltip {
+    border: 5px solid #1E90FF;
 }
 
-/* Убирает синее выделение при клике */
-.leaflet-interactive:focus {
-    outline: none !important;
+.lake-tooltip {
+    border: 5px solid #0d6efd;
 }
 
+/* ======================
+   СТИЛИ ПОПАПОВ
+   ====================== */
+.leaflet-popup-content-wrapper {
+    padding-bottom: 10px !important;
+}
+
+/* Контейнер для списка рыб */
 .fish-list {
     max-height: 300px;
     overflow-y: auto;
-  }
+    overflow-x: hidden;
+    padding-right: 5px;
+    margin-right: -5px;
+}
+
+/* Элементы списка рыб */
 .fish-item {
-  margin-bottom: 10px;
-  padding: 8px;
-  background: #f0f8ff;
-  border-radius: 4px;
-  cursor: pointer; /* Делаем курсор указателем */
-  transition: all 0.2s ease; /* Плавные переходы */
+    margin-bottom: 10px;
+    padding: 8px;
+    background: #f0f8ff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .fish-item:hover {
-  background: #d0e8ff; /* Изменение цвета при наведении */
-  transform: translateX(3px); /* Легкий сдвиг */
+    background: #d0e8ff;
+    transform: translateX(3px);
 }
 
-.fish-item h4 {
-    margin: 0 0 5px 0;
+.fish-item strong {
+    display: block;
+    margin-bottom: 5px;
     color: #1E90FF;
 }
 
-/* Убираем подчеркивание у названия рыбы, так как теперь кликабелен весь блок */
-.fish-item strong {
-  text-decoration: none;
-  color: inherit;
+.fish-short-desc {
+    font-size: 13px;
+    line-height: 1.4;
 }
 
-/* Добавляем индикатор кликабельности */
-.fish-item::after {
-  content: " ";
-  float: right;
-  color: #1E90FF;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.fish-item:hover::after {
-  opacity: 1;
-}
-
-.fish-item:active {
-  transform: translateX(3px) scale(0.98);
-}
-
-  /* Добавьте в конец файла */
-
-.fish-link {
-  color: #1E90FF;
-  cursor: pointer;
-  text-decoration: underline;
-}
-
-.fish-link:hover {
-  color: #0d6efd;
-}
-
-/* Фиксим горизонтальный скролл */
+/* Детальная информация о рыбе */
 .fish-details {
-  max-width: 300px;
-  max-height: 400px;
-  overflow-y: auto;
-  overflow-x: hidden; /* Добавляем это */
-  padding: 10px;
-  box-sizing: border-box; /* Важно для корректного расчёта ширины */
+    max-width: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
 }
-
-
-/* Фиксим отступы, чтобы контент не вылазил за границы */
-.fish-details section {
-  margin-bottom: 15px;
-  word-break: break-word; /* Перенос длинных слов */
-}
-
-/* Убираем горизонтальный скролл у списка рыб */
-.fish-list {
-  max-height: 300px;
-  overflow-y: auto;
-  overflow-x: hidden; /* Добавляем это */
-  padding-right: 5px; /* Компенсируем исчезновение скроллбара */
-  margin-right: -5px; /* Компенсируем padding */
-}
-
-/* Кастомный скроллбар */
-.fish-list::-webkit-scrollbar,
-.fish-details::-webkit-scrollbar {
-  width: 6px;
-}
-
-.fish-list::-webkit-scrollbar-track,
-.fish-details::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-.fish-list::-webkit-scrollbar-thumb,
-.fish-details::-webkit-scrollbar-thumb {
-  background: #1E90FF;
-  border-radius: 3px;
-}
-
-.fish-list::-webkit-scrollbar-thumb:hover,
-.fish-details::-webkit-scrollbar-thumb:hover {
-  background: #0d6efd;
-}
-
-.leaflet-popup-content-wrapper {
-  padding-bottom: 10px !important; /* Убираем лишний отступ */
-}
-
 
 .fish-details h3 {
-  color: #1E90FF;
-  margin-bottom: 15px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 5px;
+    color: #1E90FF;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
 }
 
 .fish-details section {
-  margin-bottom: 15px;
+    margin-bottom: 15px;
+    word-break: break-word;
 }
 
 .fish-details h4 {
-  color: #1E90FF;
-  margin: 10px 0 5px 0;
-  font-size: 14px;
+    color: #1E90FF;
+    margin: 10px 0 5px 0;
+    font-size: 14px;
 }
 
 .fish-details p {
-  margin: 5px 0;
-  font-size: 13px;
-  line-height: 1.4;
+    margin: 5px 0;
+    font-size: 13px;
+    line-height: 1.4;
 }
 
 .life-cycle p {
-  margin-left: 10px;
+    margin-left: 10px;
 }
 
-/* КНОПКА ВОЗВРАТА В МЕНЮ */
-.fish-details {
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
-}
-
+/* Кнопка "Назад" */
 .popup-footer {
-  margin-top: auto;
-  padding-top: 15px;
-  border-top: 1px solid #eee;
-  text-align: center;
+    margin-top: auto;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    text-align: center;
 }
 
 .back-button {
-  background: #1E90FF;
-  color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s ease;
-  width: 100%;
-  max-width: 200px;
+    background: #1E90FF;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    width: 100%;
+    max-width: 200px;
 }
 
 .back-button:hover {
-  background: #0d6efd;
-  transform: translateY(-2px);
+    background: #0d6efd;
+    transform: translateY(-2px);
 }
 
 .back-button:active {
-  transform: scale(0.98);
+    transform: scale(0.98);
 }
 
-/* УЛУЧШЕННЫЙ КОНТРОЛЛЕР СЛОЕВ С АНИМАЦИЕЙ */
+/* ======================
+   КОНТРОЛЛЕР СЛОЕВ
+   ====================== */
 .leaflet-control-layers {
     background: rgba(255, 255, 255, 0.95);
     border: 2px solid #1E90FF !important;
     border-radius: 15px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
-    max-height: 40px; /* Начальное состояние */
+    max-height: 80px;
 }
 
-/* Состояние при раскрытии */
 .leaflet-control-layers-expanded {
-    max-height: 300px; /* Достаточно для содержимого */
+    max-height: 300px;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     padding: 8px !important;
 }
@@ -234,47 +190,36 @@
     transform: rotate(90deg);
 }
 
-/* Плавное появление элементов */
 .leaflet-control-layers-list {
     opacity: 0;
-    transition: opacity 0.3s ease 0.1s; /* Задержка для красоты */
+    transition: opacity 0.3s ease 0.1s;
 }
 
 .leaflet-control-layers-expanded .leaflet-control-layers-list {
     opacity: 1;
 }
 
-/* Кнопка переключения рельефа */
-.relief-toggle {
-    position: absolute;
-    top: 10px;
-    right: 50px;
-    z-index: 1000;
-    background: white;
-    padding: 5px;
-    border-radius: 5px;
-    box-shadow: 0 0 5px rgba(0,0,0,0.3);
-    transition: all 0.3s ease;
+/* ======================
+   КАСТОМНЫЙ СКРОЛЛБАР
+   ====================== */
+.fish-list::-webkit-scrollbar,
+.fish-details::-webkit-scrollbar {
+    width: 6px;
 }
 
-.relief-toggle:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-    transform: translateY(-1px);
+.fish-list::-webkit-scrollbar-track,
+.fish-details::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
 }
 
-/* Стиль для подсказки озера */
-.lake-tooltip {
-    background: rgba(255, 255, 255, 0.9);
-    border: 5px solid #0d6efd;
-    border-radius: 6px;
-    padding: 2px 6px;
-    font-size: 12px;
-    color: #333;
-    white-space: nowrap;
+.fish-list::-webkit-scrollbar-thumb,
+.fish-details::-webkit-scrollbar-thumb {
+    background: #1E90FF;
+    border-radius: 3px;
 }
 
-/* Стиль для полигона озера при наведении */
-.leaflet-interactive.lake-highlight:hover {
-    fill-opacity: 0.5;
-    weight: 3;
+.fish-list::-webkit-scrollbar-thumb:hover,
+.fish-details::-webkit-scrollbar-thumb:hover {
+    background: #0d6efd;
 }
