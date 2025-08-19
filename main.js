@@ -202,6 +202,13 @@ Promise.all([
                 onEachFeature: (feature, layer) => {
                     const riverName = feature.properties.name;
                     const fishes = fishByRiver[riverName] || [];
+
+                    // Добавляем всплывающую подсказку для рек
+                    layer.bindTooltip(riverName, {
+                        permanent: false,
+                        className: 'river-tooltip',
+                        direction: 'top' // Можно настроить положение
+                    });                    
                     
                     // Основной попап
                     layer.bindPopup(createFishPopup(riverName, fishes));
