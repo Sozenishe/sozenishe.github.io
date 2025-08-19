@@ -1,290 +1,237 @@
-// // 1. Функция для анимации рек
-// function animateRiver(layer, speed = 100, dashArray = '10, 10') {
-//     let offset = 0;
-//     const interval = setInterval(() => {
-//       offset = (offset + 1) % 20;
-//       layer.setStyle({ dashOffset: offset });
-//     }, speed);
-//     return { interval, dashArray };
-// }
-// // 1. Функция для анимации рек
-function animateWaterBody(layer, options = {}) {
-    const {
-        speed = 150,  // Базовая скорость (можно регулировать)
-        baseDashArray = '15, 10',
-        hoverDashArray = '10, 5',
-        baseWeight = 2,
-        hoverWeight = 4,
-        baseOpacity = 0.8,
-        hoverOpacity = 1
-    } = options;
-
-    let offset = 0;
-    let interval = null;
-
-    // Функция обновления анимации
-    const updateAnimation = () => {
-        offset = (offset - 1) % 20;
-        layer.setStyle({ dashOffset: -offset });
-    };
-
-    // Запуск анимации
-    const startAnimation = (currentSpeed) => {
-        if (interval) clearInterval(interval);  // Очищаем предыдущий интервал
-        interval = setInterval(updateAnimation, currentSpeed);
-    };
-
-    // Старт базовой анимации
-    startAnimation(speed);
-
-    // Обработчики событий (без рекурсии)
-    layer.on('mouseover', () => {
-        layer.setStyle({
-            weight: hoverWeight,
-            dashArray: hoverDashArray,
-            opacity: hoverOpacity
-        });
-        startAnimation(speed);  // Можно оставить speed или сделать speed * 1.5 для замедления
-    });
-
-    layer.on('mouseout', () => {
-        layer.setStyle({
-            weight: baseWeight,
-            dashArray: baseDashArray,
-            opacity: baseOpacity
-        });
-        startAnimation(speed);  // Возвращаем базовую скорость
-    });
-
-    return { interval, options };
-}
-
-// 2. Инициализация карты
+/**
+ * Инициализация карты Leaflet с центром на Камчатке (56.0, 159.0) и zoom=6
+ */
 const map = L.map('map').setView([56.0, 159.0], 6);
 
-// 3. Слои (основные и оверлеи)
+// ======================
+// 1. БАЗОВЫЕ СЛОИ КАРТЫ
+// ======================
+
+/** Основные слои карты */
 const baseLayers = {
     "OSM Стандарт": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap'
     }),
     "Рельеф (OpenTopoMap)": L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenTopoMap',
-        maxZoom: 17  // OpenTopoMap имеет ограничение по зуму
+        maxZoom: 17  // Ограничение OpenTopoMap
     })
 };
 
+/** Полупрозрачный слой рельефа */
 const reliefOverlay = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}', {
     opacity: 0.4,
     attribution: 'Esri World Shaded Relief'
 });
 
-// 4. Добавляем стандартный слой и контролы
+// Добавляем стандартный слой и контролы слоев
 baseLayers["OSM Стандарт"].addTo(map);
 const layerControl = L.control.layers(baseLayers, {
     "Рельеф (полупрозрачный)": reliefOverlay
 }).addTo(map);
-  
-  // 3. Загрузка данных
-  Promise.all([
-    fetch('Data_Rivers.geojson').then(res => res.json()),
-    fetch('Data_Fish.json').then(res => res.json()),
-    fetch('Kurilskoye_Lake.geojson').then(res => res.json())
-  ])
+
+// ======================
+// 2. ЗАГРУЗКА ДАННЫХ
+// ======================
+
+Promise.all([
+    fetch('Data_Rivers.geojson').then(res => res.json()),  // Геоданные рек
+    fetch('Data_Fish.json').then(res => res.json()),      // Данные о рыбах
+    fetch('Kurilskoye_Lake.geojson').then(res => res.json())  // Данные озера
+])
 .then(([riversGeoData, fishData, lakeData]) => {
-    // Загружаем данные о нерке
+    // Дополнительная загрузка данных о нерке
     fetch('Data_Nerka.json')
-      .then(res => res.json())
-      .then(nerkaData => {
-        const fishByRiver = fishData.reduce((acc, item) => {
-          if (!acc[item.name]) acc[item.name] = [];
-          acc[item.name].push({ name: item.fish, description: item.description });
-          return acc;
-        }, {});
-
-        // Стиль для рек
-        const riverStyle = {
-          color: '#1E90FF',
-          weight: 3,
-          opacity: 0.8
-        };
-
-        // Стиль для озера Курильское
-        const lakeStyle = {
-          fillColor: '#1E90FF',
-          weight: 2,
-          opacity: 1,
-          color: '#0d6efd',
-          fillOpacity: 0.3
-        };
-
-        // Функция для создания попапа с рыбами (общая для рек и озера)
-        function createFishPopup(name, fishes) {
-          return `
-            <b>${name}</b>
-            <ul class="fish-list">
-              ${fishes.map(fish => `
-                <li class="fish-item" data-fish="${fish.name}">
-                  <strong>${fish.name}</strong>
-                  <div class="fish-short-desc">${fish.description}</div>
-                </li>
-              `).join('')}
-            </ul>
-          `;
-        }
-
-        // Функция для создания HTML попапа с деталями о нерке
-        function createNerkaPopup(nerkaData) {
-          const data = nerkaData.nerka;
-          return `
-            <div class="fish-details">
-              <h3>Нерка (${data.systematic.species})</h3>
-              
-              <section>
-                <h4>Систематика</h4>
-                <div class="life-cycle">
-                  <p><strong>Класс:</strong> ${data.systematic.class}</p>
-                  <p><strong>Отряд:</strong> ${data.systematic.order}</p>
-                  <p><strong>Семейство:</strong> ${data.systematic.family}</p>
-                </div>
-              </section>
-              
-              <section>
-                <h4>Распространение</h4>
-                <div class="life-cycle">
-                  <p>${data.distribution}</p>
-                </div>
-              </section>
-              
-              <section>
-                <h4>Размер</h4>
-                <div class="life-cycle">
-                  <p>${data.size}</p>
-                </div>
-              </section>
-              
-              <section>
-                <h4>Цикл развития</h4>
-                <div class="life-cycle">
-                  <p><strong>Нерест:</strong> ${data.life_cycle.spawning.period}</p>
-                  <p><strong>Вылупление:</strong> ${data.life_cycle.spawning.hatching}</p>
-                  <p><strong>Миграция:</strong> ${data.life_cycle.first_migration.description}</p>
-                  <p><strong>Первая зимовка:</strong> ${data.life_cycle.first_wintering.description}</p>
-                  <p><strong>Вторая зимовка:</strong> ${data.life_cycle.second_wintering.description}</p>
-                  <p><strong>Морской нагул:</strong> ${data.life_cycle.marine_feeding.duration}</p>
-                  <p><strong>Пресноводный нагул:</strong> ${data.life_cycle.freshwater_feeding.duration}</p>
-                  <p><strong>Обратная миграция в озеро:</strong> ${data.life_cycle.return_migration.description}</p>
-                </div>
-              </section>
-              <div class="popup-footer">
-                <button class="back-button">← Назад к списку</button>
-              </div>
-            </div>
-          `;
-        }
-
-        // Добавляем озеро Курильское
-        L.geoJSON(lakeData, {
-          style: lakeStyle,
-          onEachFeature: (feature, layer) => {
-            const lakeName = "Курильское озеро";
-            const fishes = fishByRiver["Курильское"] || []; // Предполагаем, что в Data_Fish.json есть запись для "Курильское"
-            
-            layer.bindTooltip(lakeName, {
-              permanent: false,
-              className: 'lake-tooltip'
-            });
-
-            layer.bindPopup(createFishPopup(lakeName, fishes));
-            
-            // Обработчик для попапа нерки (аналогично рекам)
-            layer.on('popupopen', function() {
-              document.querySelectorAll('.fish-item').forEach(item => {
-                item.addEventListener('click', () => {
-                  if (item.dataset.fish === 'Нерка') {
-                    const nerkaPopup = L.popup()
-                      .setLatLng(layer.getPopup().getLatLng())
-                      .setContent(createNerkaPopup(nerkaData))
-                      .openOn(map);
-                      
-                    nerkaPopup._container.addEventListener('click', (e) => {
-                      if (e.target.classList.contains('back-button')) {
-                        nerkaPopup.remove();
-                        layer.openPopup();
-                      }
-                    });
-                  }
+        .then(res => res.json())
+        .then(nerkaData => {
+            // Преобразуем данные о рыбах в удобный формат: {река: [рыбы]}
+            const fishByRiver = fishData.reduce((acc, item) => {
+                if (!acc[item.name]) acc[item.name] = [];
+                acc[item.name].push({
+                    name: item.fish,
+                    description: item.description
                 });
-              });
-            });
-          }
-        }).addTo(map);
+                return acc;
+            }, {});
 
-L.geoJSON(riversGeoData, {
-    style: riverStyle,
-    onEachFeature: (feature, layer) => {
-        const riverName = feature.properties.name;
-        const fishes = fishByRiver[riverName] || [];
+            // ======================
+            // 3. СТИЛИ ОБЪЕКТОВ
+            // ======================
 
-        // Анимация для всех рек
-        layer.setStyle({ dashArray: '15, 10' });
-        const animation = animateWaterBody(layer, {
-            baseWeight: 2,
-            hoverWeight: 4,
-            baseDashArray: '15, 10',
-            hoverDashArray: '10, 5'
-        });
+            /** Стиль для рек */
+            const riverStyle = {
+                color: '#1E90FF',  // Синий цвет
+                weight: 2,         // Толщина линии
+                opacity: 0.8,
+            };       
 
+            /** Стиль для озера Курильское */
+            const lakeStyle = {
+                fillColor: '#1E90FF',
+                weight: 2,
+                opacity: 1,
+                color: '#0d6efd',
+                fillOpacity: 0.3
+            };
 
-        // Подсказка
-        layer.bindTooltip(riverName, {
-            permanent: false,
-            className: 'river-tooltip'
-        });
+            // ======================
+            // 4. ФУНКЦИИ ДЛЯ ПОПАПОВ
+            // ======================
 
-            layer.bindPopup(`
-              <b>${riverName}</b>
-              <ul class="fish-list">
-                ${fishes.map(fish => `
-                  <li class="fish-item" data-fish="${fish.name}">
-                    <strong>${fish.name}</strong>
-                    <div class="fish-short-desc">${fish.description}</div>
-                  </li>
-                `).join('')}
-              </ul>
-            `);
+            /**
+             * Создает HTML-контент попапа со списком рыб
+             * @param {string} name - Название водоема
+             * @param {Array} fishes - Массив объектов с рыбами
+             */
+            function createFishPopup(name, fishes) {
+                return `
+                    <b>${name}</b>
+                    <ul class="fish-list">
+                        ${fishes.map(fish => `
+                            <li class="fish-item" data-fish="${fish.name}">
+                                <strong>${fish.name}</strong>
+                                <div class="fish-short-desc">${fish.description}</div>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+            }
 
-            // Обработчик открытия попапа
-            layer.on('popupopen', function() {
-              const currentPopup = layer.getPopup();
-              const riverName = feature.properties.name;
-              
-              document.querySelectorAll('.fish-item').forEach(item => {
-                item.addEventListener('click', () => {
-                  if (item.dataset.fish === 'Нерка') {
-                    const nerkaPopup = L.popup()
-                      .setLatLng(currentPopup.getLatLng())
-                      .setContent(createNerkaPopup(nerkaData, riverName, fishes))
-                      .openOn(map);
+            /**
+             * Создает детализированный попап с информацией о нерке
+             * @param {Object} nerkaData - Данные о нерке
+             */
+            function createNerkaPopup(nerkaData) {
+                const data = nerkaData.nerka;
+                return `
+                    <div class="fish-details">
+                        <h3>Нерка (${data.systematic.species})</h3>
+                        
+                        <section>
+                            <h4>Систематика</h4>
+                            <div class="life-cycle">
+                                <p><strong>Класс:</strong> ${data.systematic.class}</p>
+                                <p><strong>Отряд:</strong> ${data.systematic.order}</p>
+                                <p><strong>Семейство:</strong> ${data.systematic.family}</p>
+                            </div>
+                        </section>
+                        
+                        <section>
+                            <h4>Распространение</h4>
+                            <div class="life-cycle">
+                                <p>${data.distribution}</p>
+                            </div>
+                        </section>
+                        
+                        <section>
+                            <h4>Размер</h4>
+                            <div class="life-cycle">
+                                <p>${data.size}</p>
+                            </div>
+                        </section>
+                        
+                        <section>
+                            <h4>Цикл развития</h4>
+                            <div class="life-cycle">
+                                <p><strong>Нерест:</strong> ${data.life_cycle.spawning.period}</p>
+                                <p><strong>Вылупление:</strong> ${data.life_cycle.spawning.hatching}</p>
+                                <p><strong>Миграция:</strong> ${data.life_cycle.first_migration.description}</p>
+                                <p><strong>Первая зимовка:</strong> ${data.life_cycle.first_wintering.description}</p>
+                                <p><strong>Вторая зимовка:</strong> ${data.life_cycle.second_wintering.description}</p>
+                                <p><strong>Морской нагул:</strong> ${data.life_cycle.marine_feeding.duration}</p>
+                                <p><strong>Пресноводный нагул:</strong> ${data.life_cycle.freshwater_feeding.duration}</p>
+                                <p><strong>Обратная миграция в озеро:</strong> ${data.life_cycle.return_migration.description}</p>
+                            </div>
+                        </section>
+                        <div class="popup-footer">
+                            <button class="back-button">← Назад к списку</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // ======================
+            // 5. ДОБАВЛЕНИЕ ОЗЕРА
+            // ======================
+
+            L.geoJSON(lakeData, {
+                style: lakeStyle,
+                onEachFeature: (feature, layer) => {
+                    const lakeName = "Курильское озеро";
+                    const fishes = fishByRiver["Курильское"] || [];
                     
-                    // Обработчик кнопки назад
-                    nerkaPopup._container.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('back-button')) {
-                      nerkaPopup.remove();
-                      currentPopup.setLatLng(nerkaPopup.getLatLng()).openOn(map);
-                    }
+                    // Всплывающая подсказка
+                    layer.bindTooltip(lakeName, {
+                        permanent: false,
+                        className: 'lake-tooltip'
                     });
-                  }
-                });
-              });
-            });
 
-      }
-    }).addTo(map);
-  })
-  
-      .catch(error => console.error('Ошибка загрузки данных о нерке:', error));
-  })
+                    // Основной попап
+                    layer.bindPopup(createFishPopup(lakeName, fishes));
+                    
+                    // Обработчик для отображения деталей о нерке
+                    layer.on('popupopen', function() {
+                        document.querySelectorAll('.fish-item').forEach(item => {
+                            item.addEventListener('click', () => {
+                                if (item.dataset.fish === 'Нерка') {
+                                    const nerkaPopup = L.popup()
+                                        .setLatLng(layer.getPopup().getLatLng())
+                                        .setContent(createNerkaPopup(nerkaData))
+                                        .openOn(map);
+                                        
+                                    // Обработчик кнопки "Назад"
+                                    nerkaPopup._container.addEventListener('click', (e) => {
+                                        if (e.target.classList.contains('back-button')) {
+                                            nerkaPopup.remove();
+                                            layer.openPopup();
+                                        }
+                                    });
+                                }
+                            });
+                        });
+                    });
+                }
+            }).addTo(map);
 
-.catch(error => console.error('Ошибка:', error));
+            // ======================
+            // 6. ДОБАВЛЕНИЕ РЕК
+            // ======================
 
+            L.geoJSON(riversGeoData, {
+                style: riverStyle,
+                onEachFeature: (feature, layer) => {
+                    const riverName = feature.properties.name;
+                    const fishes = fishByRiver[riverName] || [];
+                    
+                    // Основной попап
+                    layer.bindPopup(createFishPopup(riverName, fishes));
 
+                    // Обработчик для отображения деталей о нерке
+                    layer.on('popupopen', function() {
+                        const currentPopup = layer.getPopup();
+                        
+                        document.querySelectorAll('.fish-item').forEach(item => {
+                            item.addEventListener('click', () => {
+                                if (item.dataset.fish === 'Нерка') {
+                                    const nerkaPopup = L.popup()
+                                        .setLatLng(currentPopup.getLatLng())
+                                        .setContent(createNerkaPopup(nerkaData))
+                                        .openOn(map);
+                                    
+                                    // Обработчик кнопки "Назад"
+                                    nerkaPopup._container.addEventListener('click', (e) => {
+                                        if (e.target.classList.contains('back-button')) {
+                                            nerkaPopup.remove();
+                                            currentPopup.setLatLng(nerkaPopup.getLatLng()).openOn(map);
+                                        }
+                                    });
+                                }
+                            });
+                        });
+                    });
+                }
+            }).addTo(map);
+        })
+        .catch(error => console.error('Ошибка загрузки данных о нерке:', error));
+})
+.catch(error => console.error('Ошибка загрузки основных данных:', error));
