@@ -76,11 +76,18 @@
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s ease;
+    position: relative;
 }
 
 .fish-item:hover {
     background: #d0e8ff;
     transform: translateX(3px);
+}
+
+.fish-item:active {
+    transform: scale(0.97) translateX(3px);
+    background: #b0d8ff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .fish-item strong {
