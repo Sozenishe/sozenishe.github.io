@@ -103,8 +103,8 @@
 
 /* Детальная информация о рыбе */
 .fish-details {
-    max-width: 300px;
-    max-height: 400px;
+    max-width: 700px;
+    max-height: 500px;
     overflow-y: auto;
     overflow-x: hidden;
     padding: 10px;
@@ -214,6 +214,7 @@
     width: 6px;
 }
 
+
 .fish-list::-webkit-scrollbar-track,
 .fish-details::-webkit-scrollbar-track {
     background: #f1f1f1;
@@ -229,4 +230,46 @@
 .fish-list::-webkit-scrollbar-thumb:hover,
 .fish-details::-webkit-scrollbar-thumb:hover {
     background: #0d6efd;
+}
+
+/* ======================
+   СТИЛИ ДЛЯ 3D МОДЕЛИ
+   ====================== */
+
+/* Контейнер для модели */
+.sketchfab-embed-wrapper {
+    margin: 15px 0;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    position: relative;
+}
+
+/* IFrame модели */
+.sketchfab-embed-wrapper iframe {
+    width: 100% !important;
+    height: 250px !important;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+    display: block;
+}
+
+/* Обертка для лучшего позиционирования */
+.model-container {
+    padding: 10px;
+    margin: 15px -10px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 8px;
+    border-left: 3px solid #1E90FF;
+}
+
+/* Заголовок над моделью */
+.model-title {
+    text-align: center;
+    color: #1E90FF;
+    font-size: 14px;
+    margin-bottom: 8px;
+    font-weight: 600;
 }
