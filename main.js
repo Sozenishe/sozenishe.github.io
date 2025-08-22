@@ -107,6 +107,19 @@ Promise.all([
                     <div class="fish-details">
                         <h3>Нерка (${data.systematic.species})</h3>
                         
+                        <div class="model-container">
+                            <div class="model-title">3D модель нерки</div>
+                            <div class="sketchfab-embed-wrapper">
+                                <iframe title="Red Salmon" frameborder="0" allowfullscreen 
+                                        mozallowfullscreen="true" webkitallowfullscreen="true" 
+                                        allow="autoplay; fullscreen; xr-spatial-tracking" 
+                                        xr-spatial-tracking execution-while-out-of-viewport 
+                                        execution-while-not-rendered web-share 
+                                        src="https://sketchfab.com/models/5d2a5c7458e4428180c27f0da7b27a4a/embed?ui_theme=dark">
+                                </iframe>       
+                            </div>
+                        </div>
+
                         <section>
                             <h4>Систематика</h4>
                             <div class="life-cycle">
