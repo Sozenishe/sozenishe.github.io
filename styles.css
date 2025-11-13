@@ -305,16 +305,16 @@
 
 /* Основной попап со списком рыб */
 .leaflet-popup-content-wrapper {
-    max-width: 400px !important; /* Компактная ширина для списка */
+    max-width: 600px !important; /* Компактная ширина для списка */
     width: auto !important;
-    min-width: 300px !important;
+    min-width: 400px !important;
     border-radius: 10px !important;
     box-shadow: 0 6px 20px rgba(0,0,0,0.12) !important;
 }
 
 .leaflet-popup-content {
     width: auto !important;
-    max-width: 380px !important;
+    max-width: 580px !important;
     margin: 10px 15px !important;
 }
 
@@ -350,144 +350,4 @@
     font-size: 12px;
     line-height: 1.4;
     color: #666;
-}
-
-/* ======================
-   ДЕТАЛЬНЫЙ ПОПАП С ИНФОРМАЦИЕЙ О РЫБЕ (ШИРОКИЙ)
-   ====================== */
-
-/* Специальный класс для детальных попапов - применяется напрямую к wrapper */
-.leaflet-popup-content-wrapper.fish-details-popup {
-    max-width: 650px !important; /* Широкий для детальной информации */
-    min-width: 500px !important;
-    border-radius: 12px !important;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
-}
-
-.leaflet-popup-content-wrapper.fish-details-popup .leaflet-popup-content {
-    max-width: 630px !important;
-    margin: 15px 20px !important;
-}
-
-/* Контейнер детальной информации о рыбе */
-.fish-details-popup .fish-details {
-    max-width: 600px !important;
-    width: 100% !important;
-    max-height: 70vh !important;
-    overflow-y: auto;
-    padding: 15px 5px;
-    display: flex;
-    flex-direction: column;
-}
-
-.fish-details-popup .fish-details h3 {
-    color: #1E90FF;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #1E90FF;
-    padding-bottom: 10px;
-    font-size: 17px; /* Уменьшили с 20px */
-    text-align: center;
-    line-height: 1.2; /* Уменьшили межстрочный интервал */
-    word-wrap: break-word; /* Перенос длинных слов */
-    overflow-wrap: break-word; /* Современная альтернатива */
-    hyphens: auto; /* Автоматическая расстановка переносов (если поддерживается) */
-}
-
-/* Для очень длинных названий на мобильных */
-@media (max-width: 480px) {
-    .fish-details-popup .fish-details h3 {
-        font-size: 16px;
-        padding: 0 5px 8px 5px; /* Уменьшили отступы */
-    }
-}
-
-.fish-details-popup .fish-details section {
-    margin-bottom: 18px;
-    padding: 14px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border-left: 4px solid #1E90FF;
-}
-
-.fish-details-popup .fish-details h4 {
-    color: #1E90FF;
-    margin: 0 0 10px 0;
-    font-size: 16px;
-    font-weight: 600;
-}
-
-.fish-details-popup .fish-details p {
-    margin: 8px 0;
-    font-size: 14px;
-    line-height: 1.5;
-}
-
-/* Контейнер для 3D модели в детальном попапе */
-.fish-details-popup .model-container {
-    padding: 15px;
-    margin: 18px -5px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-radius: 10px;
-    border-left: 4px solid #1E90FF;
-    text-align: center;
-}
-
-.fish-details-popup .sketchfab-embed-wrapper iframe {
-    width: 100% !important;
-    height: 280px !important;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-}
-
-.fish-details-popup .model-title {
-    text-align: center;
-    color: #1E90FF;
-    font-size: 16px;
-    margin-bottom: 12px;
-    font-weight: 600;
-}
-
-/* Кнопка "Назад" в детальном попапе */
-.fish-details-popup .popup-footer {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 2px solid #e9ecef;
-    text-align: center;
-}
-
-.fish-details-popup .back-button {
-    background: #1E90FF;
-    color: white;
-    border: none;
-    padding: 12px 30px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    width: auto;
-    min-width: 150px;
-}
-
-.fish-details-popup .back-button:hover {
-    background: #0d6efd;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
-}
-
-/* Адаптивность для детального попапа */
-@media (max-width: 768px) {
-    .leaflet-popup-content-wrapper.fish-details-popup {
-        max-width: 90vw !important;
-        min-width: unset !important;
-    }
-    
-    .fish-details-popup .fish-details {
-        max-width: 85vw !important;
-        max-height: 75vh !important;
-    }
-    
-    .fish-details-popup .sketchfab-embed-wrapper iframe {
-        height: 220px !important;
-    }
 }
