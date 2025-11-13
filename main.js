@@ -309,7 +309,7 @@ Promise.all([
 function createNerkaPopup(nerkaData) {
     const data = nerkaData.nerka;
     return `
-    <div class="fish-details-popup">
+
         <div class="fish-details">
             <h3>Нерка (${data.systematic.species})</h3>
             
@@ -352,7 +352,7 @@ function createNerkaPopup(nerkaData) {
                 <button class="back-button">← Назад к списку</button>
             </div>
         </div>
-    </div>
+
     `;
 }
 
@@ -363,7 +363,6 @@ function createNerkaPopup(nerkaData) {
 function createKisutchPopup(kisutchData) {
     const data = kisutchData.kisutch;
     return `
-        <div class="fish-details-popup">
             <div class="fish-details">
                 <h3>Кижуч (${data.systematic.species})</h3>
                 
@@ -400,7 +399,6 @@ function createKisutchPopup(kisutchData) {
                     <button class="back-button">← Назад к списку</button>
                 </div>
             </div>
-        </div>
     `;
 }
 
@@ -411,7 +409,6 @@ function createKisutchPopup(kisutchData) {
 function createGorbuschaPopup(gorbuschaData) {
     const data = gorbuschaData.gorbuscha;
     return `
-        <div class="fish-details-popup">
             <div class="fish-details">
                 <h3>Горбуша (${data.systematic.species})</h3>
                 
@@ -448,7 +445,6 @@ function createGorbuschaPopup(gorbuschaData) {
                     <button class="back-button">← Назад к списку</button>
                 </div>
             </div>
-        </div>
     `;
 }
 
@@ -459,7 +455,6 @@ function createGorbuschaPopup(gorbuschaData) {
 function createKetaPopup(ketaData) {
     const data = ketaData.keta;
     return `
-        <div class="fish-details-popup">
             <div class="fish-details">
                 <h3>Кета (${data.systematic.species})</h3>
                 
@@ -495,7 +490,6 @@ function createKetaPopup(ketaData) {
                     <button class="back-button">← Назад к списку</button>
                 </div>
             </div>
-        </div>
     `;
 }
 
@@ -529,13 +523,6 @@ function createKetaPopup(ketaData) {
                                 .setLatLng(layer.getPopup().getLatLng())
                                 .setContent(createNerkaPopup(nerkaData))
                                 .openOn(map);
-
-                                // Принудительно добавляем класс для стилизации
-                                setTimeout(() => {
-                                    if (fishPopup._container) {
-                                        fishPopup._container.querySelector('.leaflet-popup-content-wrapper').classList.add('fish-details-popup');
-                                    }
-                                }, 10);
                                 
                             // Обработчик кнопки "Назад"
                             fishPopup._container.addEventListener('click', (e) => {
@@ -549,13 +536,6 @@ function createKetaPopup(ketaData) {
                                 .setLatLng(layer.getPopup().getLatLng())
                                 .setContent(createKisutchPopup(kisutchData))
                                 .openOn(map);
-
-                                // Принудительно добавляем класс для стилизации
-                                setTimeout(() => {
-                                    if (fishPopup._container) {
-                                        fishPopup._container.querySelector('.leaflet-popup-content-wrapper').classList.add('fish-details-popup');
-                                    }
-                                }, 10);
                                 
                             // Обработчик кнопки "Назад"
                             fishPopup._container.addEventListener('click', (e) => {
@@ -570,13 +550,6 @@ function createKetaPopup(ketaData) {
                                 .setContent(createGorbuschaPopup(gorbuschaData))
                                 .openOn(map);
 
-                                // Принудительно добавляем класс для стилизации
-                                setTimeout(() => {
-                                    if (fishPopup._container) {
-                                        fishPopup._container.querySelector('.leaflet-popup-content-wrapper').classList.add('fish-details-popup');
-                                    }
-                                }, 10);
-                            
                             // Обработчик кнопки "Назад"
                             fishPopup._container.addEventListener('click', (e) => {
                                 if (e.target.classList.contains('back-button')) {
@@ -590,13 +563,6 @@ function createKetaPopup(ketaData) {
                                 .setContent(createKetaPopup(ketaData))
                                 .openOn(map);
 
-                                // Принудительно добавляем класс для стилизации
-                                setTimeout(() => {
-                                    if (fishPopup._container) {
-                                        fishPopup._container.querySelector('.leaflet-popup-content-wrapper').classList.add('fish-details-popup');
-                                    }
-                                }, 10);
-                            
                             // Обработчик кнопки "Назад"
                             fishPopup._container.addEventListener('click', (e) => {
                                 if (e.target.classList.contains('back-button')) {
@@ -642,13 +608,6 @@ function createKetaPopup(ketaData) {
                                 .setLatLng(currentPopup.getLatLng())
                                 .setContent(createNerkaPopup(nerkaData))
                                 .openOn(map);
-
-                                // Принудительно добавляем класс для стилизации
-                                setTimeout(() => {
-                                    if (fishPopup._container) {
-                                        fishPopup._container.querySelector('.leaflet-popup-content-wrapper').classList.add('fish-details-popup');
-                                    }
-                                }, 10);
                             
                             // Обработчик кнопки "Назад"
                             fishPopup._container.addEventListener('click', (e) => {
@@ -662,13 +621,6 @@ function createKetaPopup(ketaData) {
                                 .setLatLng(currentPopup.getLatLng())
                                 .setContent(createKisutchPopup(kisutchData))
                                 .openOn(map);
-
-                                // Принудительно добавляем класс для стилизации
-                                setTimeout(() => {
-                                    if (fishPopup._container) {
-                                        fishPopup._container.querySelector('.leaflet-popup-content-wrapper').classList.add('fish-details-popup');
-                                    }
-                                }, 10);
                             
                             // Обработчик кнопки "Назад"
                             fishPopup._container.addEventListener('click', (e) => {
@@ -682,13 +634,6 @@ function createKetaPopup(ketaData) {
                                 .setLatLng(currentPopup.getLatLng())
                                 .setContent(createGorbuschaPopup(gorbuschaData))
                                 .openOn(map);
-
-                                // Принудительно добавляем класс для стилизации
-                                setTimeout(() => {
-                                    if (fishPopup._container) {
-                                        fishPopup._container.querySelector('.leaflet-popup-content-wrapper').classList.add('fish-details-popup');
-                                    }
-                                }, 10);
                             
                             // Обработчик кнопки "Назад"
                             fishPopup._container.addEventListener('click', (e) => {
@@ -702,13 +647,6 @@ function createKetaPopup(ketaData) {
                                 .setLatLng(currentPopup.getLatLng()) // ТЕПЕРЬ currentPopup ОПРЕДЕЛЕН
                                 .setContent(createKetaPopup(ketaData))
                                 .openOn(map);
-
-                                // Принудительно добавляем класс для стилизации
-                                setTimeout(() => {
-                                    if (fishPopup._container) {
-                                        fishPopup._container.querySelector('.leaflet-popup-content-wrapper').classList.add('fish-details-popup');
-                                    }
-                                }, 10);
                             
                             // Обработчик кнопки "Назад"
                             fishPopup._container.addEventListener('click', (e) => {
