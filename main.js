@@ -235,20 +235,16 @@ const layerControl = L.control.layers(baseLayers, {
 Promise.all([
     fetch('Data/Data_Geo/Data_Rivers.geojson').then(res => res.json()),
     fetch('Data/Data_fish/Data_Fish.json').then(res => res.json()),
-    fetch('Data/Data_Geo/Kurilskoye_Lake.geojson').then(res => res.json())
+    fetch('Data/Data_Geo/Kurilskoye_Lake.geojson').then(res => res.json()),
+    fetch('Data/Data_Geo/Kronotskoye_Lake.geojson').then(res => res.json()),
+    // Загружаем данные о рыбах параллельно 
+    fetch('Data/Data_fish/Data_Nerka.json').then(res => res.json()),
+    fetch('Data/Data_fish/Data_kisutch.json').then(res => res.json()),
+    fetch('Data/Data_fish/Data_gorbuscha.json').then(res => res.json()),
+    fetch('Data/Data_fish/Data_keta.json').then(res => res.json()),
+    fetch('Data/Data_fish/Data_tschawytscha.json').then(res => res.json())
 ])
-.then(([riversGeoData, fishData, lakeData]) => {
-    // Загружаем данные о рыбах параллельно
-    return Promise.all([
-        Promise.resolve([riversGeoData, fishData, lakeData]),
-        fetch('Data/Data_fish/Data_Nerka.json').then(res => res.json()),
-        fetch('Data/Data_fish/Data_kisutch.json').then(res => res.json()),
-        fetch('Data/Data_fish/Data_gorbuscha.json').then(res => res.json()),
-        fetch('Data/Data_fish/Data_keta.json').then(res => res.json())
-    ]);
-})
-.then(([[riversGeoData, fishData, lakeData], nerkaData, kisutchData, gorbuschaData, ketaData]) => {
-    // Преобразуем данные о рыбах в удобный формат: {река: [рыбы]}
+.then(([riversGeoData, fishData, kurilskoyeLakeData, kronotskoyeLakeData, nerkaData, kisutchData, gorbuschaData, ketaData, tschawytschaData]) => {
     const fishByRiver = fishData.reduce((acc, item) => {
         if (!acc[item.name]) acc[item.name] = [];
         acc[item.name].push({
@@ -269,7 +265,7 @@ Promise.all([
         opacity: 0.8,
     };       
 
-    /** Стиль для озера Курильское */
+    /** Универсальный стиль для всех озер */
     const lakeStyle = {
         fillColor: '#1E90FF',
         weight: 2,
@@ -277,6 +273,7 @@ Promise.all([
         color: '#0d6efd',
         fillOpacity: 0.3
     };
+
 
     // ======================
     // 4. ФУНКЦИИ ДЛЯ ПОПАПОВ
@@ -301,7 +298,7 @@ Promise.all([
         `;
     }
 
-    /**
+
 /**
  * Создает детализированный попап с информацией о нерке
  * @param {Object} nerkaData - Данные о нерке
@@ -323,6 +320,54 @@ function createNerkaPopup(nerkaData) {
                             execution-while-not-rendered web-share 
                             src="https://sketchfab.com/models/5d2a5c7458e4428180c27f0da7b27a4a/embed?ui_theme=dark">
                     </iframe>       
+                </div>
+            </div>
+
+            <section>
+                <h4>Систематика</h4>
+                <div class="life-cycle">
+                    <p><strong>Класс:</strong> ${data.systematic.class}</p>
+                    <p><strong>Отряд:</strong> ${data.systematic.order}</p>
+                    <p><strong>Семейство:</strong> ${data.systematic.family}</p>
+                </div>
+            </section>
+            
+            <section>
+                <h4>Распространение</h4>
+                <div class="life-cycle">
+                    <p>${data.distribution}</p>
+                </div>
+            </section>
+            
+            <section>
+                <h4>Цикл развития</h4>
+                <div class="life-cycle">
+                    <p> ${data.life_cycle.description}</p>
+                </div>
+            </section>
+            <div class="popup-footer">
+                <button class="back-button">← Назад к списку</button>
+            </div>
+        </div>
+
+    `;
+}
+
+/**
+ * Создает детализированный попап с информацией о чавыче
+ * @param {Object} tschawytschaData - Данные о чавыче
+ */
+function createtschawytschaPopup(tschawytschaData) {
+    const data = tschawytschaData.tschawytscha;
+    return `
+
+        <div class="fish-details">
+            <h3>Чавыча (${data.systematic.species})</h3>
+            
+            <div class="model-container">
+                <div class="model-title">3D модель чавычи</div>
+                <div class="sketchfab-embed-wrapper">
+                <iframe title="Chinook Salmon ( Ocean phase )" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share src="https://sketchfab.com/models/4d36e5f3db7e4c33908c42790e59caf3/embed"> </iframe>
                 </div>
             </div>
 
@@ -494,10 +539,11 @@ function createKetaPopup(ketaData) {
 }
 
     // ======================
-    // 5. ДОБАВЛЕНИЕ ОЗЕРА
+    // 5. ДОБАВЛЕНИЕ ОЗЕР
     // ======================
 
-    L.geoJSON(lakeData, {
+    // Курильское озеро (ИСПРАВЛЕНО: используем kurilskoyeLakeData вместо lakeData)
+    L.geoJSON(kurilskoyeLakeData, {
         style: lakeStyle,
         onEachFeature: (feature, layer) => {
             const lakeName = "Курильское озеро";
@@ -546,7 +592,7 @@ function createKetaPopup(ketaData) {
                             });
                         } else if (item.dataset.fish === 'Горбуша') {
                             const fishPopup = L.popup()
-                                .setLatLng(currentPopup.getLatLng()) // ТЕПЕРЬ currentPopup ОПРЕДЕЛЕН
+                                .setLatLng(currentPopup.getLatLng())
                                 .setContent(createGorbuschaPopup(gorbuschaData))
                                 .openOn(map);
 
@@ -559,8 +605,112 @@ function createKetaPopup(ketaData) {
                             });
                         } else if (item.dataset.fish === 'Кета') {
                             const fishPopup = L.popup()
-                                .setLatLng(currentPopup.getLatLng()) // ТЕПЕРЬ currentPopup ОПРЕДЕЛЕН
+                                .setLatLng(currentPopup.getLatLng())
                                 .setContent(createKetaPopup(ketaData))
+                                .openOn(map);
+
+                            // Обработчик кнопки "Назад"
+                            fishPopup._container.addEventListener('click', (e) => {
+                                if (e.target.classList.contains('back-button')) {
+                                    fishPopup.remove();
+                                    currentPopup.setLatLng(fishPopup.getLatLng()).openOn(map);
+                                }
+                            });
+                        } else if (item.dataset.fish === 'Чавыча') {
+                            const fishPopup = L.popup()
+                                .setLatLng(currentPopup.getLatLng())
+                                .setContent(createtschawytschaPopup(tschawytschaData))
+                                .openOn(map);
+
+                            // Обработчик кнопки "Назад"
+                            fishPopup._container.addEventListener('click', (e) => {
+                                if (e.target.classList.contains('back-button')) {
+                                    fishPopup.remove();
+                                    currentPopup.setLatLng(fishPopup.getLatLng()).openOn(map);
+                                }
+                            });
+                        }
+                    });
+                });
+            });
+        }
+    }).addTo(map);
+
+    // Кроноцкое озеро
+    L.geoJSON(kronotskoyeLakeData, {
+        style: lakeStyle, 
+        onEachFeature: (feature, layer) => {
+            const lakeName = "Кроноцкое озеро";
+            const fishes = fishByRiver["Кроноцкое"] || []; // Добавьте данные по рыбам в Data_Fish.json
+            
+            layer.bindTooltip(lakeName, {
+                permanent: false,
+                className: 'lake-tooltip'
+            });
+
+            layer.bindPopup(createFishPopup(lakeName, fishes));
+            
+            // Обработчик для отображения деталей о рыбах
+            layer.on('popupopen', function() {
+                const currentPopup = layer.getPopup(); 
+                
+                document.querySelectorAll('.fish-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        if (item.dataset.fish === 'Нерка') {
+                            const fishPopup = L.popup()
+                                .setLatLng(layer.getPopup().getLatLng())
+                                .setContent(createNerkaPopup(nerkaData))
+                                .openOn(map);
+                                
+                            fishPopup._container.addEventListener('click', (e) => {
+                                if (e.target.classList.contains('back-button')) {
+                                    fishPopup.remove();
+                                    layer.openPopup();
+                                }
+                            });
+                        } else if (item.dataset.fish === 'Кижуч') {
+                            const fishPopup = L.popup()
+                                .setLatLng(layer.getPopup().getLatLng())
+                                .setContent(createKisutchPopup(kisutchData))
+                                .openOn(map);
+                                
+                            // Обработчик кнопки "Назад"
+                            fishPopup._container.addEventListener('click', (e) => {
+                                if (e.target.classList.contains('back-button')) {
+                                    fishPopup.remove();
+                                    layer.openPopup();
+                                }
+                            });
+                        } else if (item.dataset.fish === 'Горбуша') {
+                            const fishPopup = L.popup()
+                                .setLatLng(currentPopup.getLatLng())
+                                .setContent(createGorbuschaPopup(gorbuschaData))
+                                .openOn(map);
+
+                            // Обработчик кнопки "Назад"
+                            fishPopup._container.addEventListener('click', (e) => {
+                                if (e.target.classList.contains('back-button')) {
+                                    fishPopup.remove();
+                                    currentPopup.setLatLng(fishPopup.getLatLng()).openOn(map);
+                                }
+                            });
+                        } else if (item.dataset.fish === 'Кета') {
+                            const fishPopup = L.popup()
+                                .setLatLng(currentPopup.getLatLng())
+                                .setContent(createKetaPopup(ketaData))
+                                .openOn(map);
+
+                            // Обработчик кнопки "Назад"
+                            fishPopup._container.addEventListener('click', (e) => {
+                                if (e.target.classList.contains('back-button')) {
+                                    fishPopup.remove();
+                                    currentPopup.setLatLng(fishPopup.getLatLng()).openOn(map);
+                                }
+                            });
+                        } else if (item.dataset.fish === 'Чавыча') {
+                            const fishPopup = L.popup()
+                                .setLatLng(currentPopup.getLatLng())
+                                .setContent(createtschawytschaPopup(tschawytschaData))
                                 .openOn(map);
 
                             // Обработчик кнопки "Назад"
@@ -591,7 +741,7 @@ function createKetaPopup(ketaData) {
             layer.bindTooltip(riverName, {
                 permanent: false,
                 className: 'river-tooltip',
-                direction: 'top' // Можно настроить положение
+                direction: 'top'
             });                    
             
             // Основной попап
@@ -648,6 +798,19 @@ function createKetaPopup(ketaData) {
                                 .setContent(createKetaPopup(ketaData))
                                 .openOn(map);
                             
+                            // Обработчик кнопки "Назад"
+                            fishPopup._container.addEventListener('click', (e) => {
+                                if (e.target.classList.contains('back-button')) {
+                                    fishPopup.remove();
+                                    currentPopup.setLatLng(fishPopup.getLatLng()).openOn(map);
+                                }
+                            });
+                        } else if (item.dataset.fish === 'Чавыча') {
+                            const fishPopup = L.popup()
+                                .setLatLng(currentPopup.getLatLng())
+                                .setContent(createtschawytschaPopup(tschawytschaData))
+                                .openOn(map);
+
                             // Обработчик кнопки "Назад"
                             fishPopup._container.addEventListener('click', (e) => {
                                 if (e.target.classList.contains('back-button')) {
