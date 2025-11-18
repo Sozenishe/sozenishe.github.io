@@ -12,7 +12,6 @@
     width: 100vw;
 }
 
-/* Скрытие атрибуции Leaflet */
 .leaflet-control-attribution {
     display: none !important;
 }
@@ -20,7 +19,6 @@
 /* ======================
    СТИЛИ ДЛЯ КАРТЫ И ОБЪЕКТОВ
    ====================== */
-/* Общие стили для интерактивных элементов */
 .leaflet-interactive {
     transition: all 0.2s ease;
 }
@@ -57,23 +55,32 @@
    ====================== */
 .leaflet-popup-content-wrapper {
     padding-bottom: 10px !important;
+    max-width: 600px !important;
+    width: auto !important;
+    min-width: 400px !important;
+    border-radius: 10px !important;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12) !important;
 }
 
-/* Контейнер для списка рыб */
+.leaflet-popup-content {
+    width: auto !important;
+    max-width: 580px !important;
+    margin: 10px 15px !important;
+}
+
+/* Список рыб */
 .fish-list {
-    max-height: 300px;
+    max-height: 350px;
     overflow-y: auto;
-    overflow-x: hidden;
     padding-right: 5px;
     margin-right: -5px;
 }
 
-/* Элементы списка рыб */
 .fish-item {
     margin-bottom: 10px;
-    padding: 8px;
+    padding: 10px;
     background: #f0f8ff;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
     position: relative;
@@ -87,18 +94,19 @@
 .fish-item:active {
     transform: scale(0.97) translateX(3px);
     background: #b0d8ff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .fish-item strong {
     display: block;
     margin-bottom: 5px;
     color: #1E90FF;
+    font-size: 14px;
 }
 
 .fish-short-desc {
     font-size: 13px;
     line-height: 1.4;
+    color: #666;
 }
 
 /* Детальная информация о рыбе */
@@ -171,39 +179,67 @@
 }
 
 /* ======================
-   КОНТРОЛЛЕР СЛОЕВ
+   СТИЛИ ДЛЯ 3D МОДЕЛИ
    ====================== */
-.leaflet-control-layers {
-    background: rgba(255, 255, 255, 0.95);
-    border: 2px solid #1E90FF !important;
-    border-radius: 15px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
-    max-height: 80px;
+.model-container {
+    padding: 10px;
+    margin: 15px -10px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 8px;
+    border-left: 3px solid #1E90FF;
 }
 
-.leaflet-control-layers-expanded {
-    max-height: 300px;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    padding: 8px !important;
+.sketchfab-embed-wrapper {
+    margin: 15px 0;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
 }
 
-.leaflet-control-layers-toggle {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%231E90FF"><path d="M12 4.5C7 4.5 2.7 7.6 1 12c1.7 4.4 6 7.5 11 7.5s9.3-3.1 11-7.5c-1.7-4.4-6-7.5-11-7.5zm0 12.5c-2.8 0-5-2.2-5-5s2.2-5 5-5 5 2.2 5 5-2.2 5-5 5z"/></svg>') !important;
-    transition: transform 0.3s ease;
+.sketchfab-embed-wrapper iframe {
+    width: 100% !important;
+    height: 250px !important;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+    display: block;
 }
 
-.leaflet-control-layers-toggle:hover {
-    transform: rotate(90deg);
+.model-title {
+    text-align: center;
+    color: #1E90FF;
+    font-size: 14px;
+    margin-bottom: 8px;
+    font-weight: 600;
 }
 
-.leaflet-control-layers-list {
-    opacity: 0;
-    transition: opacity 0.3s ease 0.1s;
+/* ======================
+   СТИЛИ ДЛЯ РЕЧНЫХ ПОРОГОВ
+   ====================== */
+.adaptive-rapids-marker {
+    transition: all 0.3s ease-in-out;
+    animation: gentlePulse 4s infinite;
 }
 
-.leaflet-control-layers-expanded .leaflet-control-layers-list {
-    opacity: 1;
+.rapids-tooltip {
+    background: rgba(139, 69, 19, 0.9);
+    border: 2px solid #8B4513;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+.rapids-popup h3 {
+    color: #8B4513;
+    margin-bottom: 10px;
+}
+
+.rapids-popup p {
+    margin: 5px 0;
+    font-size: 13px;
 }
 
 /* ======================
@@ -213,7 +249,6 @@
 .fish-details::-webkit-scrollbar {
     width: 6px;
 }
-
 
 .fish-list::-webkit-scrollbar-track,
 .fish-details::-webkit-scrollbar-track {
@@ -233,48 +268,8 @@
 }
 
 /* ======================
-   СТИЛИ ДЛЯ 3D МОДЕЛИ
+   ПОДСКАЗКА УПРАВЛЕНИЯ
    ====================== */
-
-/* Контейнер для модели */
-.sketchfab-embed-wrapper {
-    margin: 15px 0;
-    padding: 10px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
-    position: relative;
-}
-
-/* IFrame модели */
-.sketchfab-embed-wrapper iframe {
-    width: 100% !important;
-    height: 250px !important;
-    border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    margin: 0 auto;
-    display: block;
-}
-
-/* Обертка для лучшего позиционирования */
-.model-container {
-    padding: 10px;
-    margin: 15px -10px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-radius: 8px;
-    border-left: 3px solid #1E90FF;
-}
-
-/* Заголовок над моделью */
-.model-title {
-    text-align: center;
-    color: #1E90FF;
-    font-size: 14px;
-    margin-bottom: 8px;
-    font-weight: 600;
-}
-
-/* Стили для подсказки управления  */
 .controls-hint {
     margin-bottom: 20px;
     margin-left: 10px;
@@ -300,54 +295,12 @@
 }
 
 /* ======================
-   ПОПАП СО СПИСКОМ РЫБ (КОМПАКТНЫЙ)
+   СКРЫТИЕ СТАНДАРТНЫХ МАРКЕРОВ
    ====================== */
-
-/* Основной попап со списком рыб */
-.leaflet-popup-content-wrapper {
-    max-width: 600px !important; /* Компактная ширина для списка */
-    width: auto !important;
-    min-width: 400px !important;
-    border-radius: 10px !important;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.12) !important;
-}
-
-.leaflet-popup-content {
-    width: auto !important;
-    max-width: 580px !important;
-    margin: 10px 15px !important;
-}
-
-/* Список рыб в основном попапе */
-.fish-list {
-    max-height: 350px;
-    overflow-y: auto;
-    padding-right: 5px;
-}
-
-.fish-item {
-    margin-bottom: 8px;
-    padding: 10px;
-    background: #f0f8ff;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.fish-item:hover {
-    background: #d0e8ff;
-    transform: translateX(3px);
-}
-
-.fish-item strong {
-    display: block;
-    margin-bottom: 4px;
-    color: #1E90FF;
-    font-size: 14px;
-}
-
-.fish-short-desc {
-    font-size: 12px;
-    line-height: 1.4;
-    color: #666;
+.leaflet-marker-icon[src*="marker-icon.png"],
+.leaflet-marker-shadow {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
 }
