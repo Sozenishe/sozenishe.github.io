@@ -1,4 +1,4 @@
-# Interactive Ichthyofauna Map of Kamchatka №Carto2026
+# Interactive Ichthyofauna Map of Kamchatka
 
 ![Main Map View](screenshot_fishList.jpg)
 *Interactive map with species list*
@@ -57,3 +57,4 @@ IKIROK_Prototype/
 Data Sources
 - Fish species data: Scientific articles and research papers
 - Geographical data: OpenStreetMap Overpass API
+Tags: #Carto2026
