@@ -22,7 +22,7 @@ A single-page web application for visualizing and exploring fish species distrib
 ## Technology Stack
 - **Frontend:** JavaScript, HTML5, CSS3/SCSS
 - **Mapping:** Leaflet.js
-- **Data Format:** GeoJSON
+- **Data Format:** Json, GeoJSON
 - **Version Control:** Git, GitHub Pages
 
 ## Project Structure
