@@ -1,4 +1,4 @@
-# Interactive Ichthyofauna Map of Kamchatka
+# Interactive Ichthyofauna Map of Kamchatka №Carto2026
 
 ![Main Map View](screenshot_fishList.jpg)
 *Interactive map with species list*
