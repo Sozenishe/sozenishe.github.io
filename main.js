@@ -222,13 +222,14 @@ Promise.all([
     fetch('Data/Data_fish/Data_Fish.json').then(res => res.json()),
     fetch('Data/Data_Geo/Kurilskoye_Lake.geojson').then(res => res.json()),
     fetch('Data/Data_Geo/Kronotskoye_Lake.geojson').then(res => res.json()),
+    fetch('Data/Data_Geo/Azhabachye_Lake.geojson').then(res => res.json()),
     fetch('Data/Data_fish/Data_Nerka.json').then(res => res.json()),
     fetch('Data/Data_fish/Data_kisutch.json').then(res => res.json()),
     fetch('Data/Data_fish/Data_gorbuscha.json').then(res => res.json()),
     fetch('Data/Data_fish/Data_keta.json').then(res => res.json()),
     fetch('Data/Data_fish/Data_tschawytscha.json').then(res => res.json())
 ])
-.then(([riversGeoData, fishData, kurilskoyeLakeData, kronotskoyeLakeData, ...fishSpeciesData]) => {
+.then(([riversGeoData, fishData, kurilskoyeLakeData, kronotskoyeLakeData, azhabachyeLakeData, ...fishSpeciesData]) => {
     const [nerkaData, kisutchData, gorbuschaData, ketaData, tschawytschaData] = fishSpeciesData;
     
     const fishByRiver = fishData.reduce((acc, item) => {
@@ -350,6 +351,7 @@ Promise.all([
     // ======================
     const lakesData = [
         { data: kurilskoyeLakeData, name: "Курильское озеро", fishKey: "Курильское" },
+        { data: azhabachyeLakeData, name: "Ажабачье озеро", fishKey: "Ажабачье" },
         { data: kronotskoyeLakeData, name: "Кроноцкое озеро", fishKey: "Кроноцкое" }
     ];
 
