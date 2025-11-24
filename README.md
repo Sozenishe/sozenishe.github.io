@@ -26,24 +26,26 @@ A single-page web application for visualizing and exploring fish species distrib
 - **Version Control:** Git, GitHub Pages
 
 ## Project Structure
+```
 IKIROK_Prototype/
 ├── index.html
 ├── main.js
 ├── styles.css
 ├── Data/
-│ ├── Data_fish/
-│ │ ├── Data_Fish.json
-│ │ ├── Data_gorbuscha.json
-│ │ ├── Data_keta.json
-│ │ ├── Data_kisutch.json
-│ │ ├── Data_Nerka.json
-│ │ └── Data_tschawytscha.json
-│ └── Data_Geo/
-│ ├── Azhabachye_Lake.geojson
-│ ├── Data_Rivers.geojson
-│ ├── Kronotskoye_Lake.geojson
-│ └── Kunlskoye_Lake.geojson
+│   ├── Data_fish/
+│   │   ├── Data_Fish.json
+│   │   ├── Data_gorbuscha.json
+│   │   ├── Data_keta.json
+│   │   ├── Data_kisutch.json
+│   │   ├── Data_Nerka.json
+│   │   └── Data_tschawytscha.json
+│   └── Data_Geo/
+│       ├── Azhabachye_Lake.geojson
+│       ├── Data_Rivers.geojson
+│       ├── Kronotskoye_Lake.geojson
+│       └── Kunlskoye_Lake.geojson
 └── README.md
+```
 
 ## Data Structure
 - **Data_fish/**: Contains JSON files with detailed information about different fish species
