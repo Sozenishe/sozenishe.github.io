@@ -57,4 +57,3 @@ IKIROK_Prototype/
 Data Sources
 - Fish species data: Scientific articles and research papers
 - Geographical data: OpenStreetMap Overpass API
-Tags: #Carto2026
